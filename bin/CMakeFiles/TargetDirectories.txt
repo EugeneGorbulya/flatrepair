@@ -1,9 +1,0 @@
-C:/workshop2/untitled4/bin/CMakeFiles/untitled4.dir
-C:/workshop2/untitled4/bin/CMakeFiles/edit_cache.dir
-C:/workshop2/untitled4/bin/CMakeFiles/rebuild_cache.dir
-C:/workshop2/untitled4/bin/CMakeFiles/list_install_components.dir
-C:/workshop2/untitled4/bin/CMakeFiles/install.dir
-C:/workshop2/untitled4/bin/CMakeFiles/install/local.dir
-C:/workshop2/untitled4/bin/CMakeFiles/install/strip.dir
-C:/workshop2/untitled4/bin/CMakeFiles/untitled4_autogen_timestamp_deps.dir
-C:/workshop2/untitled4/bin/CMakeFiles/untitled4_autogen.dir
