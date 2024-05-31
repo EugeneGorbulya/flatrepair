@@ -5,6 +5,7 @@
 #include <QTreeWidgetItem>
 #include <QComboBox>
 #include <QTableWidgetItem>
+#include <QLabel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,17 +22,19 @@ public:
 private:
     Ui::MainWindow *ui;
     void openCSV(QString fileName);
-    QVector<QString> getUniMenialWork(QString room);  //zzzzzzzzzzz
-    QVector<QString> getUniWorkType(QString workType);   //zzzzzzzzzzz
-    QMap<int, QVector<QString>> workDB;
     void openCSVwork(QStringList lstr);
     void openCSVmaterials(QStringList lstr);
     QVector<QString> getUniSurfaces(QString room);
+    QVector<QString> getUniMaterials(QString surface);
+    QVector<QString> getUniMenialWork(QString room);
+    QVector<QString> getUniWorkType(QString workType);
+
+    QMap<int, QVector<QString>> workDB;
     QMap<int, QVector<QString>> materialsBD;
 
     QVector<int> checktMaterials{};
 
-    QVector<QString> getUniMatirials(QString surface);
+    QLabel *totalCostLabel;
 
 protected:
 
@@ -41,5 +44,7 @@ private slots:
     void materialChecked(QTreeWidgetItem *item, int column);
     void workChecked(QTreeWidgetItem *item, int column);
     void recalcForMeters(QTableWidgetItem *item);
+    void updateTotalCost();
 };
+
 #endif // MAINWINDOW_H
