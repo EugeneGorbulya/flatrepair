@@ -11,9 +11,9 @@ int main(int argc, char *argv[])
 
     QSettings settings;
 
-    QString filePathWorksDbPath = "data/BD.main.parametrs.project1.csv";
+    QString filePathWorksDbPath;
     settings.setValue("worksDbPath", filePathWorksDbPath);
-    QString filePathMaterialsDbPath= "data/BD.work.for.project1.csv";
+    QString filePathMaterialsDbPath;
     settings.setValue("materialsDbPath", filePathMaterialsDbPath);
 
     MainWindow w;
