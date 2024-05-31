@@ -184,14 +184,14 @@ QVector<QString> MainWindow::getUniWorkType(QString workType)
     QVector<QString> result1{};
     QSet<QString> lastSur1{};
 
-    for (int i = 0; i < workDB[1].count(); i++)
+    for (int i = 0; i < workDB[2].count(); i++)
     {
-        if(workDB[0][i] == workType)
+        if(workDB[1][i] == workType)
         {
-            if(!lastSur1.contains(workDB[1][i]))
+            if(!lastSur1.contains(workDB[2][i]))
             {
-                result1.push_back(workDB[1][i]);
-                lastSur1.insert(workDB[1][i]);
+                result1.push_back(workDB[2][i]);
+                lastSur1.insert(workDB[2][i]);
             }
         }
     }
@@ -260,37 +260,69 @@ void MainWindow::roomChanged(const QString &room, int rowNum) {
         twMaterials->addTopLevelItem(twi);
         twi->setText(0, surface);
 
-        for(QString material: materialDb) {
+        QTreeWidgetItem *twi = new QTreeWidgetItem(tw);
+        tw->addTopLevelItem(twi);
+
+        twi->setText(0,surface);
+
+        ui->tableWidget->setCellWidget(rowNum, 2, tw);
+        ui->tableWidget->setRowHeight(rowNum, 100);     // третье окно в таблице (первое для материалов) по вертикали
+
+        for(QString matirial: materialDb)
+        {
             QTreeWidgetItem *twim = new QTreeWidgetItem(twi);
             twim->setCheckState(0, Qt::Unchecked);
             twim->setText(0, material);
         }
     }
 
-    tw->setCellWidget(rowNum, 2, twMaterials);
-    tw->setRowHeight(rowNum, 100);
-    connect(twMaterials, &QTreeWidget::itemClicked, this, &MainWindow::materialChecked);
+    if(ui->tableWidget->cellWidget(rowNum1, 3))              // zzzzz
+        delete ui->tableWidget->cellWidget(rowNum1, 3);      // zzzzz
 
-    // Processing work types similarly
-    QWidget *existingWidget3 = tw->cellWidget(rowNum, 3);
-    if (existingWidget3) {
-        delete existingWidget3;
+    QTreeWidget *tw1 = new QTreeWidget(this);
+    tw1->setHeaderHidden(true);
+
+    QVector<QString> workTypes = getUniMenialWork(room);
+
+    for(QString workType: workTypes)
+    {
+        QVector<QString> workDb = getUniWorkType(workType);
+
+        QTreeWidgetItem * twi1 = new QTreeWidgetItem(tw1);
+        tw1 -> addTopLevelItem(twi1);
+
+        twi1->setText(0,workType);
+
+
+        ui->tableWidget->setCellWidget(rowNum1, 3, tw1);
+        ui->tableWidget->setRowHeight(rowNum1, 100);
+
+        for(QString workT: workDb)
+        {
+            QTreeWidgetItem *twim1 = new QTreeWidgetItem(twi1);
+            twim1->setCheckState(0,Qt::Unchecked);
+            twim1->setText(0, workT);
+        }
+
+
+
     }
+    connect(tw1, &QTreeWidget::itemClicked, this, MainWindow::workChecked);
 
-    QTreeWidget *twWork = new QTreeWidget(this);
-    twWork->setHeaderHidden(true);
-    QVector<QString> workDb = getUniWorkType(room);
+    //QTreeWidgetItem *twi1 = new QTreeWidgetItem(tw1);
+    //tw1->addTopLevelItem(twi1);
+    //twi1->setText(0,workType);
 
-    for(QString workType: workDb) {
-        QTreeWidgetItem *twi = new QTreeWidgetItem(twWork);
-        twWork->addTopLevelItem(twi);
-        twi->setText(0, workType);
-    }
+    //ui->tableWidget->setCellWidget(rowNum1, 3, tw1);  // zzzz
+    //ui->tableWidget->setRowHeight(rowNum1, 100);     // zzzz четвертое окно в таблице (второе для работы) по вертикали
 
-    tw->setCellWidget(rowNum, 3, twWork);
-    tw->setRowHeight(rowNum, 100);
-    connect(twWork, &QTreeWidget::itemClicked, this, &MainWindow::workChecked);
-}
+    //for(QString work1: workDb)
+    //{
+    //    QTreeWidgetItem *twim1 = new QTreeWidgetItem(twi1);
+    //    twim1->setCheckState(0,Qt::Unchecked);
+    //    twim1->setText(0,work1);
+
+    //}
 
 
 
@@ -341,6 +373,9 @@ void MainWindow::materialChecked(QTreeWidgetItem *item, int column)
     tw->blockSignals(false);
 }
 
+
+
+
 void MainWindow::workChecked(QTreeWidgetItem *item, int column)
 {
 
@@ -367,4 +402,5 @@ void MainWindow::recalcForMeters(QTableWidgetItem *item)
         tw->blockSignals(false);
     }
 }
+
 

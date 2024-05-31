@@ -43,3 +43,7 @@ private slots:
     void recalcForMeters(QTableWidgetItem *item);
 };
 #endif // MAINWINDOW_H
+
+
+
+
