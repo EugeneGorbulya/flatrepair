@@ -4,21 +4,32 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QTreeWidget>
+#include <QSettings>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+        : QMainWindow(parent)
+        , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    QString worksDb = QFileDialog::getOpenFileName(this,
-                                                   tr("Выберите базу работ"), "", tr(".csv (BD.work*.csv)"));
-    QString materialsDb = QFileDialog::getOpenFileName(this,
-                                                       tr("Выберите базу матиалов"), "", tr("csv (BD.main*.csv)"));
+
+    QSettings settings("FlarRepair", "Count");
+    QString worksDb = settings.value("worksDbPath").toString();
+    QString materialsDb = settings.value("materialsDbPath").toString();
+
+    if (worksDb.isEmpty() || materialsDb.isEmpty()) {
+        worksDb = QFileDialog::getOpenFileName(this,
+                                               tr("Выберите базу работ"), "", tr(".csv (BD.work*.csv)"));
+        materialsDb = QFileDialog::getOpenFileName(this,
+                                                   tr("Выберите базу материалов"), "", tr("csv (BD.main*.csv)"));
+
+        settings.setValue("worksDbPath", worksDb);
+        settings.setValue("materialsDbPath", materialsDb);
+    }
+
     openCSV(worksDb);
     openCSV(materialsDb);
-
-
 }
+
 
 MainWindow::~MainWindow()
 {
@@ -190,69 +201,64 @@ QVector<QString> MainWindow::getUniWorkType(QString workType)
 
 // zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz вверх
 
-void MainWindow::on_pushButton_clicked()
-{
-
+void MainWindow::on_pushButton_clicked() {
     int newRowNum = ui->tableWidget->rowCount();
     ui->tableWidget->insertRow(newRowNum);
     ui->tableWidget->setColumnCount(5);
     ui->tableWidget->setItem(newRowNum, 1, new QTableWidgetItem("0"));
     ui->tableWidget->setItem(newRowNum, 4, new QTableWidgetItem("0"));
-    ui->tableWidget->setColumnWidth(2, 300);     // третье окно в таблице (первое для материалов) по горизонтали
-
+    ui->tableWidget->setColumnWidth(2, 300);
 
     QComboBox *cb = new QComboBox(this);
     cb->insertItem(0, "Choose a room:");
     cb->setDuplicatesEnabled(false);
     QString lastItem{};
-    for(QString str: materialsBD[0])
-    {
-        if(str != lastItem)
+    for(QString str: materialsBD[0]) {
+        if(str != lastItem) {
             cb->insertItem(cb->count(), str);
+        }
         lastItem = str;
     }
 
-
     ui->tableWidget->setCellWidget(newRowNum, 0, cb);
-    connect(cb, &QComboBox::currentTextChanged, this, &MainWindow::roomChanged );
 
+    // Передаем номер строки через сигнал и слот
+    connect(cb, &QComboBox::currentTextChanged, this, [this, newRowNum](const QString &room) {
+        int rowNum = newRowNum == 0 ? -1 : newRowNum;
+        this->roomChanged(room, rowNum);
+    });
 
-    //    int newRowNum1 = ui->tableWidget->rowCount(); // zzzz
-    //    ui->tableWidget->insertRow(newRowNum1);       // zzzz
-    ui->tableWidget->setColumnWidth(3, 300);       // четвертое окно в таблице (второе для работ)
+    ui->tableWidget->setColumnWidth(3, 300);
 
-    //    QString lastItem1{};                                 //  если что удалить
-    //    for(QString str1: workDB[0])                         // если что удалить
-    //    {                                                    //  если что удалить
-    //         if(str1 != lastItem1)                             //  если что удалить
-    //             cb->insertItem(cb->count(), str1);          //  если что удалить
-    //         lastItem1 = str1;                                // если что удалить
-    //    }                                                    // если что удалить
-    //
-    //    ui->tableWidget->setCellWidget(newRowNum, 0, cb);
-    //    connect(cb, &QComboBox::currentTextChanged, this, &MainWindow::roomChanged );
-
-    connect(ui->tableWidget,&QTableWidget::itemChanged, this, recalcForMeters);
+    connect(ui->tableWidget, &QTableWidget::itemChanged, this, &MainWindow::recalcForMeters);
 }
 
+void MainWindow::roomChanged(const QString &room, int rowNum) {
+    QTableWidget *tw = ui->tableWidget;
 
+    // Debugging output
+    qDebug() << "Room changed: " << room << ", row: " << rowNum;
 
+    if (rowNum == -1) {
+        // Handle the case where the first room is currently selected
+        rowNum = 0;
+    }
 
-void MainWindow::roomChanged(QString room)    // функция которая реагирует на изменение комнаты в первом столбце таблицы
-{
-    int rowNum = ui->tableWidget->currentRow();
+    // Remove existing widgets if present
+    QWidget *existingWidget2 = tw->cellWidget(rowNum, 2);
+    if (existingWidget2) {
+        delete existingWidget2;
+    }
 
-    if(ui->tableWidget->cellWidget(rowNum, 2))
-        delete ui->tableWidget->cellWidget(rowNum, 2);
-
-    QTreeWidget *tw = new QTreeWidget(this);
-    tw->setHeaderHidden(true);
-
+    QTreeWidget *twMaterials = new QTreeWidget(this);
+    twMaterials->setHeaderHidden(true);
     QVector<QString> surfaces = getUniSurfaces(room);
 
-    for(QString surface: surfaces)
-    {
+    for(QString surface: surfaces) {
         QVector<QString> materialDb = getUniMatirials(surface);
+        QTreeWidgetItem *twi = new QTreeWidgetItem(twMaterials);
+        twMaterials->addTopLevelItem(twi);
+        twi->setText(0, surface);
 
         QTreeWidgetItem *twi = new QTreeWidgetItem(tw);
         tw->addTopLevelItem(twi);
@@ -265,15 +271,10 @@ void MainWindow::roomChanged(QString room)    // функция которая �
         for(QString matirial: materialDb)
         {
             QTreeWidgetItem *twim = new QTreeWidgetItem(twi);
-            twim->setCheckState(0,Qt::Unchecked);
-            twim->setText(0,matirial);
-
+            twim->setCheckState(0, Qt::Unchecked);
+            twim->setText(0, material);
         }
     }
-    connect(tw, &QTreeWidget::itemClicked, this, MainWindow::materialChecked);
-
-    // zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz вниз
-    int rowNum1 = ui->tableWidget->currentRow();       // zzzzz
 
     if(ui->tableWidget->cellWidget(rowNum1, 3))              // zzzzz
         delete ui->tableWidget->cellWidget(rowNum1, 3);      // zzzzz
@@ -304,6 +305,7 @@ void MainWindow::roomChanged(QString room)    // функция которая �
         }
 
 
+
     }
     connect(tw1, &QTreeWidget::itemClicked, this, MainWindow::workChecked);
 
@@ -323,13 +325,10 @@ void MainWindow::roomChanged(QString room)    // функция которая �
     //}
 
 
-    // zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz вверх
-}
-
 
 void MainWindow::materialChecked(QTreeWidgetItem *item, int column)
 {
-    int matRowNum{};
+    int matRowNum{0};
     int currRowNum = ui->tableWidget->currentRow();
     QTableWidget * tw = ui->tableWidget;
     for(matRowNum; matRowNum < materialsBD[2].count(); matRowNum++)

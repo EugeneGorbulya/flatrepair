@@ -37,7 +37,7 @@ protected:
 
 private slots:
     void on_pushButton_clicked();
-    void roomChanged(QString room);
+    void roomChanged(const QString &room, int rowNum);
     void materialChecked(QTreeWidgetItem *item, int column);
     void workChecked(QTreeWidgetItem *item, int column);
     void recalcForMeters(QTableWidgetItem *item);
