@@ -46,6 +46,8 @@ private slots:
     void workChecked(QTreeWidgetItem *item, int column);
     void recalcForMeters(QTableWidgetItem *item);
     void updateTotalCost();
+    void on_pushButton_2_clicked();
+
 };
 
 #endif // MAINWINDOW_H
