@@ -33,6 +33,7 @@ private:
     QMap<int, QVector<QString>> materialsBD;
 
     QVector<int> checktMaterials{};
+    QVector<int> checktWorks{};
 
     QLabel *totalCostLabel;
 

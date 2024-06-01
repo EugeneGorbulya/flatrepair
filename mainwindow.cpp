@@ -341,8 +341,50 @@ void MainWindow::materialChecked(QTreeWidgetItem *item, int column)
 
 void MainWindow::workChecked(QTreeWidgetItem *item, int column)
 {
-    // Implement similar logic for workChecked if needed
+    int workRowNum = 0;
+    int currRowNum = ui->tableWidget->currentRow();
+    QTableWidget *tw = ui->tableWidget;
+
+    for (; workRowNum < workDB[2].count(); ++workRowNum) {
+        QString room = static_cast<QComboBox*>(tw->cellWidget(currRowNum, 0))->currentText();
+        if (workDB[2][workRowNum].contains(item->text(0)) && workDB[0][workRowNum].contains(room) && workDB[1][workRowNum].contains(item->parent()->text(0))) {
+            break;
+        }
+    }
+
+    if (workRowNum >= workDB[2].count()) {
+        return;
+    }
+
+    double workPrice = workDB[4][workRowNum].toDouble();
+    tw->blockSignals(true);
+
+    if (item->checkState(column)) {
+        checktWorks.push_back(workRowNum);
+
+        if (workDB[3][workRowNum].toInt()) {
+            tw->setItem(currRowNum, 4, new QTableWidgetItem(QString::number(workPrice * tw->item(currRowNum, 1)->text().toDouble() + tw->item(currRowNum, 4)->text().toDouble())));
+        } else {
+            tw->setItem(currRowNum, 4, new QTableWidgetItem(QString::number(workPrice + tw->item(currRowNum, 4)->text().toDouble())));
+        }
+    } else {
+        checktWorks.removeOne(workRowNum);
+
+        if (workDB[3][workRowNum].toInt()) {
+            tw->setItem(currRowNum, 4, new QTableWidgetItem(QString::number(tw->item(currRowNum, 4)->text().toDouble() - workPrice * tw->item(currRowNum, 1)->text().toDouble())));
+        } else {
+            tw->setItem(currRowNum, 4, new QTableWidgetItem(QString::number(tw->item(currRowNum, 4)->text().toDouble() - workPrice)));
+        }
+    }
+
+    double newValue = tw->item(currRowNum, 4)->text().toDouble();
+    newValue = qFabs(newValue) < 0.000001 ? 0.0 : newValue;
+    tw->setItem(currRowNum, 4, new QTableWidgetItem(QString::number(newValue)));
+
+    tw->blockSignals(false);
+    updateTotalCost(); // Update total cost whenever a work is checked or unchecked
 }
+
 
 void MainWindow::recalcForMeters(QTableWidgetItem *item)
 {
@@ -351,6 +393,7 @@ void MainWindow::recalcForMeters(QTableWidgetItem *item)
 
     int currRowNum = tw->currentRow();
     double totalMaterialCost = 0.0; // Общая стоимость материалов для текущей строки
+    double totalWorkCost = 0.0;
     // Пересчитываем стоимость для всех выбранных материалов
     for (int matRowNum : checktMaterials) {
         tw->blockSignals(true);
@@ -370,8 +413,26 @@ void MainWindow::recalcForMeters(QTableWidgetItem *item)
         tw->blockSignals(false);
     }
 
+    for (int workRowNum : checktWorks) {
+        tw->blockSignals(true);
+        double workPrice = workDB[4][workRowNum].toDouble();
+        QString room = static_cast<QComboBox*>(tw->cellWidget(currRowNum, 0))->currentText();
+        QString workSurface = workDB[1][workRowNum];
+        QString workRoom = workDB[0][workRowNum];
+
+        // Проверяем, что работа соответствует текущему типу комнаты
+        if (workRoom == room) {
+            // Пересчитываем стоимость работы в зависимости от нового значения метража
+            double meters = tw->item(currRowNum, 1)->text().toDouble();
+            double workCost = workDB[3][workRowNum].toInt() ? workPrice * meters : workPrice;
+            totalWorkCost += workCost;
+        }
+
+        tw->blockSignals(false);
+    }
+
     // Устанавливаем новую стоимость для текущей строки
-    tw->item(currRowNum, 4)->setText(QString::number(totalMaterialCost));
+    tw->item(currRowNum, 4)->setText(QString::number(totalMaterialCost + totalWorkCost));
 
     updateTotalCost(); // Обновляем общую стоимость
     qDebug() << "Exiting recalcForMeters";
