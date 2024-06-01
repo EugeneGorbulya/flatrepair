@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include "xlsxdocument.h"
+#include <QTableWidget>
 #include <QFileDialog>
 #include <QFile>
 #include <QMessageBox>
@@ -455,3 +457,68 @@ void MainWindow::updateTotalCost()
     totalCostLabel->setText(QString("Total Cost: %1").arg(totalCost));
     qDebug() << "IAMALIVE13";
 }
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    // Создаем объект для хранения данных Excel
+    QXlsx::Document xlsx;
+
+    // Начинаем заполнение таблицы с ячейки A1
+    int currentRow = 1;
+    int currentCol = 1;
+
+    // Получаем указатель на виджет таблицы
+    QTableWidget *tableWidget = ui->tableWidget;
+
+    // Перебираем все строки таблицы
+    for (int row = 0; row < tableWidget->rowCount(); ++row)
+    {
+        // Получаем комнату из первого столбца (комбо-бокса)
+        QComboBox *comboBoxRoom = qobject_cast<QComboBox*>(tableWidget->cellWidget(row, 0));
+        QString room = comboBoxRoom->currentText();
+
+        // Получаем выбранные материалы из второго столбца (дерева)
+        for (int matRowNum : checktMaterials) {
+            tableWidget->blockSignals(true);
+            double materialPrice = materialsBD[4][matRowNum].toDouble();
+            QString materialSurface = materialsBD[1][matRowNum];
+            QString materialRoom = materialsBD[0][matRowNum];
+            QString material = materialsBD[2][matRowNum];
+            if (materialRoom == room) {
+                // Записываем данные в три ячейки Excel: комната, поверхность и материал
+                xlsx.write(currentRow, 1, room);     // Записываем комнату
+                xlsx.write(currentRow, 2, materialSurface);   // Записываем поверхность
+                xlsx.write(currentRow, 3, material);                // Записываем материал
+                xlsx.write(currentRow, 4, materialPrice);
+               // Переходим на следующую строку в Excel
+                currentRow++;
+            }
+        }
+
+        // Получаем выбранные работы из третьего столбца (дерева)
+        for (int matRowNum : checktWorks) {
+            tableWidget->blockSignals(true);
+            double workPrice = workDB[4][matRowNum].toDouble();
+            QString workSurface = workDB[1][matRowNum];
+            QString workRoom = workDB[0][matRowNum];
+            QString work = workDB[2][matRowNum];
+            if (workRoom == room) {
+                // Записываем данные в три ячейки Excel: комната, поверхность и материал
+                xlsx.write(currentRow, 1, room);     // Записываем комнату
+                xlsx.write(currentRow, 2, workSurface);   // Записываем поверхность
+                xlsx.write(currentRow, 3, work);                // Записываем материал
+                xlsx.write(currentRow, 4, workPrice);
+                // Переходим на следующую строку в Excel
+                currentRow++;
+            }
+        }
+    }
+    // Сохраняем файл Excel
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Сохранить как"), "", tr("Excel файл (*.xlsx)"));
+    if (!filePath.isEmpty())
+    {
+        xlsx.saveAs(filePath);
+    }
+
+}
+
