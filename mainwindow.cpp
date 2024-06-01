@@ -5,10 +5,11 @@
 #include <QMessageBox>
 #include <QTreeWidget>
 #include <QSettings>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+        : QMainWindow(parent)
+        , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
@@ -171,10 +172,12 @@ void MainWindow::on_pushButton_clicked()
     connect(cb, &QComboBox::currentTextChanged, this, [this, newRowNum](const QString &room) {
         this->roomChanged(room, newRowNum);
     });
-
+    qDebug() << "IAMALIVE15";
     ui->tableWidget->setColumnWidth(3, 300);
-
+    qDebug() << "IAMALIVE16";
     connect(ui->tableWidget, &QTableWidget::itemChanged, this, &MainWindow::recalcForMeters);
+    qDebug() << "IAMALIVE17";
+
 }
 
 void MainWindow::roomChanged(const QString& room, int rowNum)
@@ -183,66 +186,90 @@ void MainWindow::roomChanged(const QString& room, int rowNum)
 
     qDebug() << "Room changed: " << room << ", row: " << rowNum;
 
-    if (rowNum == -1) {
-        rowNum = 0;
-    }
+    // Обновление данных в существующем виджете в ячейке 2
+    QTreeWidget *twMaterials = qobject_cast<QTreeWidget*>(tw->cellWidget(rowNum, 2));
+    if (twMaterials) {
+        twMaterials->clear(); // Очищаем старые данные
+        twMaterials->setHeaderHidden(true);
+        QVector<QString> surfaces = getUniSurfaces(room);
 
-    QWidget *existingWidget2 = tw->cellWidget(rowNum, 2);
-    if (existingWidget2) {
-        delete existingWidget2;
-    }
+        for (const QString& surface : surfaces) {
+            QVector<QString> materialDb = getUniMaterials(surface);
+            QTreeWidgetItem *twi = new QTreeWidgetItem(twMaterials);
+            twMaterials->addTopLevelItem(twi);
+            twi->setText(0, surface);
 
-    QTreeWidget *twMaterials = new QTreeWidget(this);
-    twMaterials->setHeaderHidden(true);
-    QVector<QString> surfaces = getUniSurfaces(room);
-
-    for (const QString& surface : surfaces) {
-        QVector<QString> materialDb = getUniMaterials(surface);
-        QTreeWidgetItem *twi = new QTreeWidgetItem(twMaterials);
-        twMaterials->addTopLevelItem(twi);
-        twi->setText(0, surface);
-
-        for (const QString& material : materialDb) {
-            QTreeWidgetItem *twim = new QTreeWidgetItem(twi);
-            twim->setCheckState(0, Qt::Unchecked);
-            twim->setText(0, material);
+            for (const QString& material : materialDb) {
+                QTreeWidgetItem *twim = new QTreeWidgetItem(twi);
+                twim->setCheckState(0, Qt::Unchecked);
+                twim->setText(0, material);
+            }
         }
-    }
+    } else {
+        QTreeWidget *twMaterials = new QTreeWidget(this);
+        twMaterials->setHeaderHidden(true);
+        QVector<QString> surfaces = getUniSurfaces(room);
 
-    tw->setCellWidget(rowNum, 2, twMaterials);
-    tw->setRowHeight(rowNum, 100);
-    connect(twMaterials, &QTreeWidget::itemClicked, this, &MainWindow::materialChecked);
+        for (const QString& surface : surfaces) {
+            QVector<QString> materialDb = getUniMaterials(surface);
+            QTreeWidgetItem *twi = new QTreeWidgetItem(twMaterials);
+            twMaterials->addTopLevelItem(twi);
+            twi->setText(0, surface);
 
-    int rowNum1 = ui->tableWidget->currentRow();
-    if (rowNum1 == -1) {
-        rowNum1 = 0;
-    }
-
-    if (ui->tableWidget->cellWidget(rowNum1, 3)) {
-        delete ui->tableWidget->cellWidget(rowNum1, 3);
-    }
-
-    QTreeWidget *tw1 = new QTreeWidget(this);
-    tw1->setHeaderHidden(true);
-
-    QVector<QString> workTypes = getUniMenialWork(room);
-
-    for (const QString& workType : workTypes) {
-        QVector<QString> workDb = getUniWorkType(workType);
-        QTreeWidgetItem *twi1 = new QTreeWidgetItem(tw1);
-        tw1->addTopLevelItem(twi1);
-        twi1->setText(0, workType);
-
-        for (const QString& workT : workDb) {
-            QTreeWidgetItem *twim1 = new QTreeWidgetItem(twi1);
-            twim1->setCheckState(0, Qt::Unchecked);
-            twim1->setText(0, workT);
+            for (const QString& material : materialDb) {
+                QTreeWidgetItem *twim = new QTreeWidgetItem(twi);
+                twim->setCheckState(0, Qt::Unchecked);
+                twim->setText(0, material);
+            }
         }
+
+
+        tw->setCellWidget(rowNum, 2, twMaterials);
+        tw->setRowHeight(rowNum, 100);
+        connect(twMaterials, &QTreeWidget::itemClicked, this, &MainWindow::materialChecked);
     }
 
-    tw->setCellWidget(rowNum1, 3, tw1);
-    tw->setRowHeight(rowNum1, 100);
-    connect(tw1, &QTreeWidget::itemClicked, this, &MainWindow::workChecked);
+    QTreeWidget *tw1 = qobject_cast<QTreeWidget*>(tw->cellWidget(rowNum, 3));
+    if (tw1) {
+        tw1->clear(); // Очищаем старые данные
+        tw1->setHeaderHidden(true);
+        QVector<QString> workTypes = getUniMenialWork(room);
+
+        for (const QString& workType : workTypes) {
+            QVector<QString> workDb = getUniWorkType(workType);
+            QTreeWidgetItem *twi1 = new QTreeWidgetItem(tw1);
+            tw1->addTopLevelItem(twi1);
+            twi1->setText(0, workType);
+
+            for (const QString& workT : workDb) {
+                QTreeWidgetItem *twim1 = new QTreeWidgetItem(twi1);
+                twim1->setCheckState(0, Qt::Unchecked);
+                twim1->setText(0, workT);
+            }
+        }
+    } else {
+        QTreeWidget *tw1 = new QTreeWidget(this);
+        tw1->setHeaderHidden(true);
+
+        QVector<QString> workTypes = getUniMenialWork(room);
+
+        for (const QString& workType : workTypes) {
+            QVector<QString> workDb = getUniWorkType(workType);
+            QTreeWidgetItem *twi1 = new QTreeWidgetItem(tw1);
+            tw1->addTopLevelItem(twi1);
+            twi1->setText(0, workType);
+
+            for (const QString& workT : workDb) {
+                QTreeWidgetItem *twim1 = new QTreeWidgetItem(twi1);
+                twim1->setCheckState(0, Qt::Unchecked);
+                twim1->setText(0, workT);
+            }
+        }
+        tw->setCellWidget(rowNum, 3, tw1);
+        tw->setRowHeight(rowNum, 100);
+        connect(tw1, &QTreeWidget::itemClicked, this, &MainWindow::workChecked);
+    }
+    updateTotalCost();
 }
 
 void MainWindow::materialChecked(QTreeWidgetItem *item, int column)
@@ -294,6 +321,7 @@ void MainWindow::workChecked(QTreeWidgetItem *item, int column)
 
 void MainWindow::recalcForMeters(QTableWidgetItem *item)
 {
+    qDebug() << "Entering recalcForMeters";
     QTableWidget *tw = ui->tableWidget;
 
     int currRowNum = tw->currentRow();
@@ -313,19 +341,21 @@ void MainWindow::recalcForMeters(QTableWidgetItem *item)
     }
 
     updateTotalCost(); // Update total cost whenever meters are recalculated
+    qDebug() << "Exiting recalcForMeters";
 }
 
 void MainWindow::updateTotalCost()
 {
+    qDebug() << "IAMALIVE10";
     double totalCost = 0.0;
     QTableWidget *tw = ui->tableWidget;
-
+    qDebug() << "IAMALIVE11";
     for (int row = 0; row < tw->rowCount(); ++row) {
         if (tw->item(row, 4)) {
             totalCost += tw->item(row, 4)->text().toDouble();
         }
     }
-
+    qDebug() << "IAMALIVE12";
     totalCostLabel->setText(QString("Total Cost: %1").arg(totalCost));
+    qDebug() << "IAMALIVE13";
 }
-
