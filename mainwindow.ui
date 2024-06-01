@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
@@ -6,84 +5,65 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1126</width>
-    <height>771</height>
+    <width>1136</width>
+    <height>805</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true">QWidget#centralwidget { background-color: #F0F8FF; }</string>
+   </property>
    <layout class="QGridLayout" name="gridLayout_2">
     <item row="0" column="0">
      <layout class="QGridLayout" name="gridLayout">
-      <item row="2" column="0">
-       <widget class="QPushButton" name="pushButton">
-        <property name="text">
-         <string>Add Room</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" colspan="2">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
       <item row="1" column="0" colspan="2">
-       <widget class="QTableWidget" name="tableWidget">
-        <property name="minimumSize">
-         <size>
-          <width>1100</width>
-          <height>600</height>
-         </size>
+       <widget class="QLabel" name="label">
+        <property name="styleSheet">
+         <string notr="true">QLabel {
+             font-size: 24px;
+             font-weight: bold;
+             color: #483D8B; /* DarkSlateBlue */
+             padding: 10px;
+             border-bottom: 2px solid #ddd;
+         }</string>
         </property>
-        <attribute name="horizontalHeaderVisible">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="verticalHeaderVisible">
-         <bool>false</bool>
-        </attribute>
-        <column>
-         <property name="text">
-          <string/>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string/>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string/>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string/>
-         </property>
-        </column>
+        <property name="text">
+         <string>Room Cost Calculator</string>
+        </property>
        </widget>
       </item>
       <item row="3" column="0" colspan="2">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <spacer name="horizontalSpacer_2">
+         <widget class="QPushButton" name="pushButton">
+          <property name="styleSheet">
+           <string notr="true">QPushButton {
+               background-color: #1E90FF; /* DodgerBlue */
+               border: none;
+               border-radius: 10px; /* Rounded corners */
+               color: white;
+               padding: 15px 32px;
+               text-align: center;
+               text-decoration: none;
+               display: inline-block;
+               font-size: 16px;
+               margin: 4px 2px;
+               cursor: pointer;
+           }
+           QPushButton:hover {
+               background-color: #4169E1; /* RoyalBlue */
+           }</string>
+          </property>
+          <property name="text">
+           <string>Add Room</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -97,12 +77,107 @@
         </item>
         <item>
          <widget class="QLabel" name="totalCostLabel">
+          <property name="styleSheet">
+           <string notr="true">QLabel {
+               font-size: 18px;
+               font-weight: bold;
+               color: #483D8B; /* DarkSlateBlue */
+               background-color: #E6E6FA; /* Lavender */
+               padding: 5px;
+               border-radius: 5px;
+           }</string>
+          </property>
           <property name="text">
            <string>Total Cost: 0</string>
           </property>
          </widget>
         </item>
        </layout>
+      </item>
+      <item row="2" column="0">
+       <widget class="QTableWidget" name="tableWidget">
+        <property name="minimumSize">
+         <size>
+          <width>1100</width>
+          <height>600</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">
+             QTableWidget {
+                 gridline-color: #F0F8FF; /* AliceBlue lines for grid */
+                 font-size: 16px;
+                 background-color: #E6E6FA; /* Lavender */
+                 color: #483D8B; /* DarkSlateBlue */
+                 border: 1px solid #F0F8FF; /* AliceBlue frame */
+             }
+             QHeaderView::section {
+                 background-color: #E6E6FA; /* Lavender */
+                 padding: 4px;
+                 border: 1px solid #F0F8FF; /* AliceBlue border for header sections */
+                 color: #483D8B; /* DarkSlateBlue */
+             }
+             QTableWidget QTableCornerButton::section {
+                 background-color: #E6E6FA; /* Lavender */
+                 border: 1px solid #F0F8FF; /* AliceBlue border for corner button */
+                 color: #483D8B; /* DarkSlateBlue */
+             }
+             QTableWidget::item {
+                 border: 1px solid #F0F8FF; /* AliceBlue border for items */
+                 background-color: #E6E6FA; /* Lavender */
+                 color: #483D8B; /* DarkSlateBlue */
+             }
+             QTableWidget::item:selected {
+                 background-color: #6A5ACD; /* SlateBlue */
+                 color: #ffffff; /* White */
+             }
+             QTableWidget::item:focus {
+                 border: 1px solid #F0F8FF; /* AliceBlue border for focused item */
+                 background-color: #E6E6FA; /* Lavender background */
+                 color: #483D8B; /* DarkSlateBlue */
+             }
+             QTableWidget::item:focus:selected {
+                 background-color: #6A5ACD; /* SlateBlue */
+                 color: #ffffff; /* White */
+             }
+             QTableWidget::item:focus:hover {
+                 background-color: #E6E6FA; /* Lavender background on hover */
+                 color: #483D8B; /* DarkSlateBlue */
+             }
+         </string>
+        </property>
+        <attribute name="horizontalHeaderVisible">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>true</bool>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>Room Type</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Square Meters</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Furniture</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Type of works</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Cost</string>
+         </property>
+        </column>
+       </widget>
       </item>
      </layout>
     </item>
@@ -113,12 +188,32 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1126</width>
+     <width>1136</width>
      <height>24</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">QMenuBar {
+        background-color: #4169E1; /* RoyalBlue */
+        color: white;
+    }
+    QMenuBar::item {
+        background-color: #4169E1; /* RoyalBlue */
+        color: white;
+    }
+    QMenuBar::item:selected {
+        background-color: #483D8B; /* DarkSlateBlue */
+    }</string>
+   </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="styleSheet">
+    <string notr="true">QStatusBar {
+        background-color: #4169E1; /* RoyalBlue */
+        color: white;
+    }</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>
