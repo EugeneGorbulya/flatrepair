@@ -159,12 +159,12 @@ void MainWindow::on_pushButton_clicked()
     cb->insertItem(0, tr("Choose a room:"));
     cb->setDuplicatesEnabled(false);
 
-    QString lastItem;
+    QString lastItem = "Room type";
     for (const QString& str : materialsBD[0]) {
         if (str != lastItem) {
             cb->insertItem(cb->count(), str);
-            lastItem = str;
         }
+        lastItem = str;
     }
 
     ui->tableWidget->setCellWidget(newRowNum, 0, cb);
@@ -186,8 +186,28 @@ void MainWindow::roomChanged(const QString& room, int rowNum)
 
     qDebug() << "Room changed: " << room << ", row: " << rowNum;
 
-    // Обновление данных в существующем виджете в ячейке 2
+    tw->item(rowNum, 1)->setText("0");
+    tw->item(rowNum, 4)->setText("0");
+
+    // Удаляем галочки с чекбоксов в виджете в ячейке 2
     QTreeWidget *twMaterials = qobject_cast<QTreeWidget*>(tw->cellWidget(rowNum, 2));
+    if (twMaterials) {
+        // Удаляем все отмеченные элементы
+        QList<QTreeWidgetItem *> checkedItems = twMaterials->findItems(QString(), Qt::MatchExactly | Qt::MatchRecursive, Qt::CheckStateRole);
+        for (QTreeWidgetItem *item : checkedItems) {
+            item->setCheckState(0, Qt::Unchecked);
+        }
+    }
+    // Удаляем галочки с чекбоксов в виджете в ячейке 3
+    QTreeWidget *tw1 = qobject_cast<QTreeWidget*>(tw->cellWidget(rowNum, 3));
+    if (tw1) {
+        // Удаляем все отмеченные элементы
+        QList<QTreeWidgetItem *> checkedItems = tw1->findItems(QString(), Qt::MatchExactly | Qt::MatchRecursive, Qt::CheckStateRole);
+        for (QTreeWidgetItem *item : checkedItems) {
+            item->setCheckState(0, Qt::Unchecked);
+        }
+    }
+    // Обновление данных в существующем виджете в ячейке 2
     if (twMaterials) {
         twMaterials->clear(); // Очищаем старые данные
         twMaterials->setHeaderHidden(true);
@@ -223,13 +243,11 @@ void MainWindow::roomChanged(const QString& room, int rowNum)
             }
         }
 
-
         tw->setCellWidget(rowNum, 2, twMaterials);
         tw->setRowHeight(rowNum, 100);
         connect(twMaterials, &QTreeWidget::itemClicked, this, &MainWindow::materialChecked);
     }
-
-    QTreeWidget *tw1 = qobject_cast<QTreeWidget*>(tw->cellWidget(rowNum, 3));
+    // Обновление данных в существующем виджете в ячейке 3
     if (tw1) {
         tw1->clear(); // Очищаем старые данные
         tw1->setHeaderHidden(true);
@@ -265,12 +283,15 @@ void MainWindow::roomChanged(const QString& room, int rowNum)
                 twim1->setText(0, workT);
             }
         }
+
         tw->setCellWidget(rowNum, 3, tw1);
         tw->setRowHeight(rowNum, 100);
         connect(tw1, &QTreeWidget::itemClicked, this, &MainWindow::workChecked);
     }
+
     updateTotalCost();
 }
+
 
 void MainWindow::materialChecked(QTreeWidgetItem *item, int column)
 {
@@ -310,6 +331,10 @@ void MainWindow::materialChecked(QTreeWidgetItem *item, int column)
         }
     }
 
+    double newValue = tw->item(currRowNum, 4)->text().toDouble();
+    newValue = qFabs(newValue) < 0.000001 ? 0.0 : newValue;
+    tw->setItem(currRowNum, 4, new QTableWidgetItem(QString::number(newValue)));
+
     tw->blockSignals(false);
     updateTotalCost(); // Update total cost whenever a material is checked or unchecked
 }
@@ -325,24 +350,34 @@ void MainWindow::recalcForMeters(QTableWidgetItem *item)
     QTableWidget *tw = ui->tableWidget;
 
     int currRowNum = tw->currentRow();
-    tw->item(currRowNum, 4)->setText("0");
-
+    double totalMaterialCost = 0.0; // Общая стоимость материалов для текущей строки
+    // Пересчитываем стоимость для всех выбранных материалов
     for (int matRowNum : checktMaterials) {
         tw->blockSignals(true);
         double materialPrice = materialsBD[4][matRowNum].toDouble();
+        QString room = static_cast<QComboBox*>(tw->cellWidget(currRowNum, 0))->currentText();
+        QString materialSurface = materialsBD[1][matRowNum];
+        QString materialRoom = materialsBD[0][matRowNum];
 
-        if (materialsBD[3][matRowNum].toInt()) {
-            tw->setItem(currRowNum, 4, new QTableWidgetItem(QString::number(materialPrice * tw->item(currRowNum, 1)->text().toDouble() + tw->item(currRowNum, 4)->text().toDouble())));
-        } else {
-            tw->setItem(currRowNum, 4, new QTableWidgetItem(QString::number(materialPrice + tw->item(currRowNum, 4)->text().toDouble())));
+        // Проверяем, что материал соответствует текущему типу комнаты
+        if (materialRoom == room) {
+            // Пересчитываем стоимость материала в зависимости от нового значения метража
+            double meters = tw->item(currRowNum, 1)->text().toDouble();
+            double materialCost = materialsBD[3][matRowNum].toInt() ? materialPrice * meters : materialPrice;
+            totalMaterialCost += materialCost;
         }
 
         tw->blockSignals(false);
     }
 
-    updateTotalCost(); // Update total cost whenever meters are recalculated
+    // Устанавливаем новую стоимость для текущей строки
+    tw->item(currRowNum, 4)->setText(QString::number(totalMaterialCost));
+
+    updateTotalCost(); // Обновляем общую стоимость
     qDebug() << "Exiting recalcForMeters";
 }
+
+//
 
 void MainWindow::updateTotalCost()
 {
