@@ -8,10 +8,11 @@
 #include <QTreeWidget>
 #include <QSettings>
 #include <QDebug>
+#include <QComboBox> // Add this include
 
 MainWindow::MainWindow(QWidget *parent)
-        : QMainWindow(parent)
-        , ui(new Ui::MainWindow)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
@@ -32,6 +33,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Initialize the total cost label
     totalCostLabel = findChild<QLabel*>("totalCostLabel");
+
+    // Connect the About button
+    connect(ui->aboutButton, &QPushButton::clicked, this, &MainWindow::showAbout);
 }
 
 MainWindow::~MainWindow()
@@ -294,7 +298,6 @@ void MainWindow::roomChanged(const QString& room, int rowNum)
     updateTotalCost();
 }
 
-
 void MainWindow::materialChecked(QTreeWidgetItem *item, int column)
 {
     int matRowNum = 0;
@@ -387,7 +390,6 @@ void MainWindow::workChecked(QTreeWidgetItem *item, int column)
     updateTotalCost(); // Update total cost whenever a work is checked or unchecked
 }
 
-
 void MainWindow::recalcForMeters(QTableWidgetItem *item)
 {
     qDebug() << "Entering recalcForMeters";
@@ -440,8 +442,6 @@ void MainWindow::recalcForMeters(QTableWidgetItem *item)
     qDebug() << "Exiting recalcForMeters";
 }
 
-//
-
 void MainWindow::updateTotalCost()
 {
     qDebug() << "IAMALIVE10";
@@ -490,7 +490,7 @@ void MainWindow::on_pushButton_2_clicked()
                 xlsx.write(currentRow, 2, materialSurface);   // Записываем поверхность
                 xlsx.write(currentRow, 3, material);                // Записываем материал
                 xlsx.write(currentRow, 4, materialPrice);
-               // Переходим на следующую строку в Excel
+                // Переходим на следующую строку в Excel
                 currentRow++;
             }
         }
@@ -520,5 +520,23 @@ void MainWindow::on_pushButton_2_clicked()
         xlsx.saveAs(filePath);
     }
 
+}
+
+void MainWindow::showAbout()
+{
+    QString aboutText = tr(
+        "The product is an application designed to help manage and calculate the costs of repairs and materials. It is written using the Qt library and is intended to facilitate the accurate calculation of repair costs. "
+        "The application can be useful for both professionals in the construction and repair industries, as well as individuals planning home repairs. "
+        );
+
+    QMessageBox aboutBox;
+    aboutBox.setWindowTitle(tr("About"));
+    aboutBox.setText(aboutText);
+    aboutBox.setStandardButtons(QMessageBox::Ok);
+    aboutBox.setStyleSheet("QMessageBox { background-color: #E6E6FA; } "
+                           "QLabel { font-size: 16px; color: #483D8B; } "
+                           "QPushButton { background-color: #1E90FF; color: white; border: none; border-radius: 10px; padding: 10px 20px; } "
+                           "QPushButton:hover { background-color: #4169E1; }");
+    aboutBox.exec();
 }
 

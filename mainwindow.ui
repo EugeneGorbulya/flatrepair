@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
@@ -5,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1136</width>
-    <height>805</height>
+    <width>1140</width>
+    <height>812</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,7 +26,7 @@
          <string notr="true">QLabel {
              font-size: 24px;
              font-weight: bold;
-             color: #483D8B; /* DarkSlateBlue */
+             color: #483D8B;
              padding: 10px;
              border-bottom: 2px solid #ddd;
          }</string>
@@ -41,9 +42,9 @@
          <widget class="QPushButton" name="pushButton">
           <property name="styleSheet">
            <string notr="true">QPushButton {
-               background-color: #1E90FF; /* DodgerBlue */
+               background-color: #1E90FF;
                border: none;
-               border-radius: 10px; /* Rounded corners */
+               border-radius: 10px;
                color: white;
                padding: 15px 32px;
                text-align: center;
@@ -54,11 +55,36 @@
                cursor: pointer;
            }
            QPushButton:hover {
-               background-color: #4169E1; /* RoyalBlue */
+               background-color: #4169E1;
            }</string>
           </property>
           <property name="text">
            <string>Add Room</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="aboutButton">
+          <property name="styleSheet">
+           <string notr="true">QPushButton {
+               background-color: #1E90FF;
+               border: none;
+               border-radius: 10px;
+               color: white;
+               padding: 15px 32px;
+               text-align: center;
+               text-decoration: none;
+               display: inline-block;
+               font-size: 16px;
+               margin: 4px 2px;
+               cursor: pointer;
+           }
+           QPushButton:hover {
+               background-color: #4169E1;
+           }</string>
+          </property>
+          <property name="text">
+           <string>About</string>
           </property>
          </widget>
         </item>
@@ -81,8 +107,8 @@
            <string notr="true">QLabel {
                font-size: 18px;
                font-weight: bold;
-               color: #483D8B; /* DarkSlateBlue */
-               background-color: #E6E6FA; /* Lavender */
+               color: #483D8B;
+               background-color: #E6E6FA;
                padding: 5px;
                border-radius: 5px;
            }</string>
@@ -105,44 +131,44 @@
         <property name="styleSheet">
          <string notr="true">
              QTableWidget {
-                 gridline-color: #F0F8FF; /* AliceBlue lines for grid */
+                 gridline-color: #F0F8FF;
                  font-size: 16px;
-                 background-color: #E6E6FA; /* Lavender */
-                 color: #483D8B; /* DarkSlateBlue */
-                 border: 1px solid #F0F8FF; /* AliceBlue frame */
+                 background-color: #E6E6FA;
+                 color: #483D8B;
+                 border: 1px solid #F0F8FF;
              }
              QHeaderView::section {
-                 background-color: #E6E6FA; /* Lavender */
+                 background-color: #E6E6FA;
                  padding: 4px;
-                 border: 1px solid #F0F8FF; /* AliceBlue border for header sections */
-                 color: #483D8B; /* DarkSlateBlue */
+                 border: 1px solid #F0F8FF;
+                 color: #483D8B;
              }
              QTableWidget QTableCornerButton::section {
-                 background-color: #E6E6FA; /* Lavender */
-                 border: 1px solid #F0F8FF; /* AliceBlue border for corner button */
-                 color: #483D8B; /* DarkSlateBlue */
+                 background-color: #E6E6FA;
+                 border: 1px solid #F0F8FF;
+                 color: #483D8B;
              }
              QTableWidget::item {
-                 border: 1px solid #F0F8FF; /* AliceBlue border for items */
-                 background-color: #E6E6FA; /* Lavender */
-                 color: #483D8B; /* DarkSlateBlue */
+                 border: 1px solid #F0F8FF;
+                 background-color: #E6E6FA;
+                 color: #483D8B;
              }
              QTableWidget::item:selected {
-                 background-color: #6A5ACD; /* SlateBlue */
-                 color: #ffffff; /* White */
+                 background-color: #6A5ACD;
+                 color: #ffffff;
              }
              QTableWidget::item:focus {
-                 border: 1px solid #F0F8FF; /* AliceBlue border for focused item */
-                 background-color: #E6E6FA; /* Lavender background */
-                 color: #483D8B; /* DarkSlateBlue */
+                 border: 1px solid #F0F8FF;
+                 background-color: #E6E6FA;
+                 color: #483D8B;
              }
              QTableWidget::item:focus:selected {
-                 background-color: #6A5ACD; /* SlateBlue */
-                 color: #ffffff; /* White */
+                 background-color: #6A5ACD;
+                 color: #ffffff;
              }
              QTableWidget::item:focus:hover {
-                 background-color: #E6E6FA; /* Lavender background on hover */
-                 color: #483D8B; /* DarkSlateBlue */
+                 background-color: #E6E6FA;
+                 color: #483D8B;
              }
          </string>
         </property>
@@ -195,28 +221,28 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1136</width>
+     <width>1140</width>
      <height>24</height>
     </rect>
    </property>
    <property name="styleSheet">
     <string notr="true">QMenuBar {
-        background-color: #4169E1; /* RoyalBlue */
+        background-color: #4169E1;
         color: white;
     }
     QMenuBar::item {
-        background-color: #4169E1; /* RoyalBlue */
+        background-color: #4169E1;
         color: white;
     }
     QMenuBar::item:selected {
-        background-color: #483D8B; /* DarkSlateBlue */
+        background-color: #483D8B;
     }</string>
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar">
    <property name="styleSheet">
     <string notr="true">QStatusBar {
-        background-color: #4169E1; /* RoyalBlue */
+        background-color: #4169E1;
         color: white;
     }</string>
    </property>
